@@ -13,7 +13,7 @@ const TestimonialCard = styled.div`
   padding: 30px;
   text-align: center;
   margin: 0 20px;
-  width: 300px;
+  inline-size: 300px;
 `;
 
 const TestimonialText = styled.p`
@@ -25,7 +25,7 @@ const TestimonialText = styled.p`
 const TestimonialAuthor = styled.p`
   font-size: 16px;
   font-weight: bold;
-  margin-top: 20px;
+  margin-block-start: 20px;
   color: #854CE6;
 `;
 
