@@ -1,6 +1,5 @@
-// /tests/App.test.js
 import { render, screen } from '@testing-library/react';
-import App from '../src/App'; // Adjust path as needed
+import App from './App'; // Adjust path as needed
 
 describe('App Component', () => {
   test('should render the app', () => {

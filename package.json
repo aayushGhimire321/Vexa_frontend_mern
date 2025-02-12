@@ -1,5 +1,4 @@
 {
-<<<<<<< HEAD
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
@@ -25,7 +24,7 @@
     "react-otp-input": "^3.1.1",
     "react-redux": "^9.2.0",
     "react-responsive-masonry": "^2.6.0",
-    "react-router-dom": "^7.1.0",
+    "react-router-dom": "^7.1.5",
     "react-scripts": "5.0.1",
     "redux-persist": "^6.0.0",
     "route": "^0.2.5",
@@ -56,10 +55,11 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-=======
-  "dependencies": {
-    "react-file-image-to-base64": "^1.0.1",
-    "timeago.js": "^4.0.2"
->>>>>>> 0283f50 (changes)
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@testing-library/user-event": "^14.6.1",
+    "jest": "^27.5.1"
   }
 }
