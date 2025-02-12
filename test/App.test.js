@@ -1,8 +1,11 @@
+// /tests/App.test.js
 import { render, screen } from '@testing-library/react';
-import App from '../src/App';
+import App from '../src/App'; // Adjust path as needed
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+describe('App Component', () => {
+  test('should render the app', () => {
+    render(<App />);
+    
+    expect(screen.getByText(/Welcome to Vexa/i)).toBeInTheDocument();
+  });
 });
