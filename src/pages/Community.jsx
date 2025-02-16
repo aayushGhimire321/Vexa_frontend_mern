@@ -24,7 +24,7 @@ const Community = () => {
     e.preventDefault();
     if (title && content) {
       try {
-        const response = await axios.post("http://localhost:5000/api/community", {
+        const response = await axios.post("http://localhost:3000/api/community", {
           title,
           content,
         });
