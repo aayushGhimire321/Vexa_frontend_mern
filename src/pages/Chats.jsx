@@ -1,26 +1,26 @@
-import React, { useEffect } from 'react'
-import ChatContainer from '../components/ChatContainer'
-import ChatContact from '../components/ChatContact'
-import styled from 'styled-components'
+import { useEffect, useState } from "react";
+import io from "socket.io-client";
+import styled from "styled-components";
+import ChatContainer from "../components/ChatContainer";
+import ChatContact from "../components/ChatContact";
+
+const socket = io("http://localhost:5000"); // Update with backend URL
 
 const Container = styled.div`
   display: flex;
   flex-direction: row;
   height: 100%;
   width: 100%;
-  display: flex;
   justify-content: center;
   align-items: center;
-  height: 100%;
   background-color: ${({ theme }) => theme.bg};
-`
+`;
 
 const Wrapper = styled.div`
   display: flex;
   flex-direction: row;
   height: 85vh;
   width: 100%;
-  display: flex;
   justify-content: center;
   align-items: center;
   margin: 12px 0px;
@@ -29,70 +29,82 @@ const Wrapper = styled.div`
       border-radius: 0px;
       height: 87vh;
   }
-`
+`;
 
 const ChatsContact = styled.div`
-margin: 12px 0px;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    max-width: 360px;
-    height: 100%;
-    background-color:  ${({ theme }) => theme.card};
-    border-right: 1px solid ${({ theme }) => theme.soft};
-    @media (max-width: 800px) {border-right: 1px solid ${({ theme }) => theme.soft};
+  margin: 12px 0px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 360px;
+  height: 100%;
+  background-color: ${({ theme }) => theme.card};
+  border-right: 1px solid ${({ theme }) => theme.soft};
+  @media (max-width: 800px) {
     border-right: none;
-    border-radius: 0px 0px 0px 0px;
-    }
-    border-radius: 10px 0px 0px 10px;
-`
+    border-radius: 0px;
+  }
+  border-radius: 10px 0px 0px 10px;
+`;
 
 const ChatsContainer = styled.div`
+  margin: 12px 0px;
+  display: flex;
+  max-width: 800px;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  background-color: ${({ theme }) => theme.card};
+  border-radius: 0px 10px 10px 0px;
+`;
 
-margin: 12px 0px;
-display: flex;
-max-width: 800px;
-width: 100%;
-height: 100%;
-flex-direction: column;
-background-color:  ${({ theme }) => theme.card};
-border-radius: 0px 10px 10px 0px;
-`
-
-const Chats = () => {
-  //get the window size and hide the chat container for mobile and dislay it for desktop
-  const [width, setWidth] = React.useState(window.innerWidth)
-  const breakpoint = 768
+export default function Chat() {
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
+  const [width, setWidth] = useState(window.innerWidth);
+  const breakpoint = 768;
+  const [showChat, setShowChat] = useState(false);
 
   useEffect(() => {
-    const handleWindowResize = () => setWidth(window.innerWidth)
-    window.addEventListener("resize", handleWindowResize)
-    return () => window.removeEventListener("resize", handleWindowResize)
-  }, [])
+    const handleWindowResize = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", handleWindowResize);
+    return () => window.removeEventListener("resize", handleWindowResize);
+  }, []);
 
-  const [showChat, setShowChat] = React.useState(false)
+  useEffect(() => {
+    socket.on("message", (message) => {
+      setMessages((prev) => [...prev, message]);
+    });
+    return () => socket.off("message");
+  }, []);
+
+  const sendMessage = () => {
+    if (input.trim()) {
+      socket.emit("message", input);
+      setInput("");
+    }
+  };
 
   return (
     <Container>
       <Wrapper>
-        {width < breakpoint ?
-          (showChat ?
+        {width < breakpoint ? (
+          showChat ? (
             <ChatContainer showChat={showChat} setShowChat={setShowChat} />
-            :
-            <ChatContact showChat={showChat} setShowChat={setShowChat} />)
-          : (
-            <>
-              <ChatsContact>
-                <ChatContact showChat={showChat} setShowChat={setShowChat} />
-              </ChatsContact>
-              <ChatsContainer>
-                <ChatContainer showChat={showChat} setShowChat={setShowChat} />
-              </ChatsContainer>
-            </>
-          )}
+          ) : (
+            <ChatContact showChat={showChat} setShowChat={setShowChat} />
+          )
+        ) : (
+          <>
+            <ChatsContact>
+              <ChatContact showChat={showChat} setShowChat={setShowChat} />
+            </ChatsContact>
+            <ChatsContainer>
+              <ChatContainer showChat={showChat} setShowChat={setShowChat} />
+            </ChatsContainer>
+          </>
+        )}
       </Wrapper>
     </Container>
-  )
+  );
 }
-
-export default Chats
