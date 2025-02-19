@@ -196,4 +196,4 @@ const DeletePopup = ({ openDelete, setOpenDelete }) => {
   )
 }
 
-export default DeletePopup
+export default DeletePopup;

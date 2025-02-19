@@ -8,7 +8,7 @@ import {
   Route,
 } from "react-router-dom"
 import Menu from './components/Menu';
-import Navbar from './pages/Home/Components/Navbar'; // Ensure the case and file location are correct
+import Navbar from './components/Navbar';
 import styled from 'styled-components';
 import Dashboard from './pages/Dashboard';
 import Works from './pages/Works';

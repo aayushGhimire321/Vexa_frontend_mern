@@ -1,16 +1,16 @@
 import React from 'react'
 import styled from 'styled-components'
-import Navbar from './Components/Navbar'
-import Hero from './Components/Hero'
-import Footer from './Components/Footer'
-import Features from './Components/Features'
-import Testimonials from './Components/Testimonials'
-import Team from './Components/Team'
-import Benefits from './Components/Benefits'; // Update the import to match the file name exactly
-import About from './Components/About'
+import Navbar from './components/Navbar'
+import Hero from './components/Hero'
+import Footer from './components/Footer'
+import Features from './components/Features'
+import Testimonials from './components/Testimonials'
+import Team from './components/Team'
+import Benefits from './components/Benifits'
+import About from './components/About'
 import SignUp from '../../components/SignUp'
 import SignIn from '../../components/SignIn'
-import Faq from './Components/Faq'
+import Faq from './components/Faq'
 
 const Body = styled.div`
     background: #13111C;

@@ -17,10 +17,11 @@ import { tools } from "../data/data";
 import { Avatar } from "@mui/material";
 import { useSelector } from "react-redux";
 import {
-  inviteProjectMembers,
   inviteTeamMembers,
+  inviteProjectMembers,
   searchUsers,
-  createTeam
+  createProject,
+  addTeamProject,
 } from "../api/index";
 import { openSnackbar } from "../redux/snackbarSlice";
 import { useDispatch } from "react-redux";
@@ -206,7 +207,6 @@ const EmailId = styled.div`
   color: ${({ theme }) => theme.textSoft + "99"};
 `;
 
-
 const Flex = styled.div`
 display: flex;
 flex-direction: row;
@@ -246,6 +246,7 @@ const Role = styled.div`
   justify-content: center;
 `;
 
+
 const InviteButton = styled.button`
   padding: 6px 14px;
   background-color: transparent;
@@ -266,30 +267,29 @@ const InviteButton = styled.button`
   }
 `;
 
-const AddNewTeam = ({ setNewTeam }) => {
+const AddNewProject = ({ setNewProject, teamId, teamProject }) => {
   const [Loading, setLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
   const [backDisabled, setBackDisabled] = useState(false);
 
-  const [showAddTeam, setShowAddTeam] = useState(true);
+  const [showAddProject, setShowAddProject] = useState(true);
   const [showTools, setShowTools] = useState(false);
   const [showAddMember, setShowAddMember] = useState(false);
-  const token = localStorage.getItem("token");
 
-  const goToAddTeam = () => {
-    setShowAddTeam(true);
+  const goToAddProject = () => {
+    setShowAddProject(true);
     setShowTools(false);
     setShowAddMember(false);
   };
 
   const goToAddTools = () => {
-    setShowAddTeam(false);
+    setShowAddProject(false);
     setShowAddMember(false);
     setShowTools(true);
   };
 
   const goToAddMember = () => {
-    setShowAddTeam(false);
+    setShowAddProject(false);
     setShowTools(false);
     setShowAddMember(true);
   };
@@ -302,8 +302,9 @@ const AddNewTeam = ({ setNewTeam }) => {
   const [role, setRole] = useState("");
   const [access, setAccess] = useState("");
   const [selectedUsers, setSelectedUsers] = React.useState([]);
-  const [inputs, setInputs] = useState({img:"", name: "", desc: "" });
+  const [inputs, setInputs] = useState({ img: "", title: "", desc: "" });
 
+  const token = localStorage.getItem("token");
   const handleSearch = async (e) => {
     setSearch(e.target.value);
     searchUsers(e.target.value, token)
@@ -336,6 +337,8 @@ const AddNewTeam = ({ setNewTeam }) => {
         access: access,
       }]);
       setUsers([]);
+      setAccess("");
+      setRole("");
       setSearch("");
     }
   };
@@ -346,10 +349,10 @@ const AddNewTeam = ({ setNewTeam }) => {
   };
 
   const handleInviteAll = (id) => {
-    let teamInvite = true;
+    let teamInvite = false;
     if (teamInvite) {
       selectedUsers.map((user) => {
-        inviteTeamMembers(id, user, token)
+        inviteTeamMembers(id, user,token)
           .then((res) => {
             console.log(res);
             dispatch(
@@ -365,9 +368,10 @@ const AddNewTeam = ({ setNewTeam }) => {
       });
     } else {
       selectedUsers.map((user) => {
-        inviteTeamMembers(id, user, token)
+        inviteProjectMembers(id, user,token)
           .then((res) => {
-            console.log(res); dispatch(
+            console.log(res);
+            dispatch(
               openSnackbar({
                 message: `Invitation sent to ${user.name}`,
                 type: "success",
@@ -375,7 +379,8 @@ const AddNewTeam = ({ setNewTeam }) => {
             );
           })
           .catch((err) => {
-            console.log(err); dispatch(
+            console.log(err);
+            dispatch(
               openSnackbar({
                 message: `Invitation cant be sent to ${user.name}`,
                 type: "error",
@@ -398,7 +403,7 @@ const AddNewTeam = ({ setNewTeam }) => {
 
   //add tools part
 
-  const [TeamTools, setTeamTools] = useState([
+  const [projectTools, setProjectTools] = useState([
     { name: "", icon: "", link: "" },
     { name: "", icon: "", link: "" },
     { name: "", icon: "", link: "" },
@@ -407,63 +412,91 @@ const AddNewTeam = ({ setNewTeam }) => {
     { name: "", icon: "", link: "" },
   ]);
   const handleToolschange = (index, event, icon) => {
-    let data = [...TeamTools];
+    let data = [...projectTools];
     //add it to input fields
     data[index].name = event.target.name;
     data[index].icon = icon;
     data[index].link = event.target.value;
-    setTeamTools(data);
+    setProjectTools(data);
   };
 
-  const CreateTeam = () => {
+  const CreateProject = () => {
     setLoading(true);
     setDisabled(true);
     setBackDisabled(true);
-    //remove the empty link objects of Team tools
-    const tools = TeamTools.filter((tool) => tool.link !== "");
-    const Team = {
+    //remove the empty link objects of project tools
+    const tools = projectTools.filter((tool) => tool.link !== "");
+    const project = {
       ...inputs,
       tools: tools,
     };
-    createTeam(Team, token)
-      .then((res) => {
-        // get the id from res and invite members function call
-        handleInviteAll(res.data._id);
-        setLoading(false);
-        setNewTeam(false);
-        dispatch(
-          openSnackbar({
-            message: "Team created successfully",
-            type: "success",
-          })
-        );
-      })
-      .catch((err) => {
-        console.log(err);
-        setLoading(false);
-        setDisabled(false);
-        setBackDisabled(false);
-        dispatch(
-          openSnackbar({
-            message: "Something went wrong",
-            type: "error",
-          })
-        );
-      });
+    if (teamProject) {
+      addTeamProject(teamId, project,token)
+        .then((res) => {
+          // get the id from res and invite members function call
+          handleInviteAll(res.data._id);
+          setLoading(false);
+          setNewProject(false);
+          dispatch(
+            openSnackbar({
+              message: "Project created successfully",
+              type: "success",
+            })
+          );
+        })
+        .catch((err) => {
+          console.log(err);
+          setLoading(false);
+          setDisabled(false);
+          setBackDisabled(false);
+          dispatch(
+            openSnackbar({
+              message: "Something went wrong",
+              type: "error",
+            })
+          );
+        });
+    } else {
+      createProject(project,token)
+        .then((res) => {
+          // get the id from res and invite members function call
+          handleInviteAll(res.data._id);
+          setLoading(false);
+          setNewProject(false);
+          dispatch(
+            openSnackbar({
+              message: "Project created successfully",
+              type: "success",
+            })
+          );
+        })
+        .catch((err) => {
+          console.log(err);
+          setLoading(false);
+          setDisabled(false);
+          setBackDisabled(false);
+          dispatch(
+            openSnackbar({
+              message: "Something went wrong",
+              type: "error",
+            })
+          );
+        });
+    }
   };
 
   useEffect(() => {
-    if (inputs.name === "" || inputs.desc === "") {
-      setDisabled(true)
+    if (inputs.title === "" || inputs.desc === "") {
+      setDisabled(true);
     } else {
-      setDisabled(false)
+      setDisabled(false);
     }
-  }, [inputs])
+  }, [inputs]);
 
   const dispatch = useDispatch();
 
   return (
-    <Modal open={true} onClose={() => setNewTeam(false)}>
+    <Modal open={true} onClose={() => setNewProject(false)}>
       <Container>
         <Wrapper>
           <IconButton
@@ -474,22 +507,22 @@ const AddNewTeam = ({ setNewTeam }) => {
               cursor: "pointer",
               color: "inherit",
             }}
-            onClick={() => setNewTeam(false)}
+            onClick={() => setNewProject(false)}
           >
             <CloseRounded style={{ color: "inherit" }} />
           </IconButton>
-          <Title>Create a new Team</Title>
+          <Title>Create a new project</Title>
 
-          {showAddTeam && (
+          {showAddProject && (
             <>
-              <Label>Team Details :</Label>
+              <Label>Project Details :</Label>
               <ImageSelector inputs={inputs} setInputs={setInputs} style={{ marginTop: "12px" }}/>
               <OutlinedBox style={{ marginTop: "12px" }}>
                 <TextInput
-                  placeholder="Team Name (Required)*"
+                  placeholder="Title (Required)*"
                   type="text"
-                  name="name"
-                  value={inputs.name}
+                  name="title"
+                  value={inputs.title}
                   onChange={handleChange}
                 />
               </OutlinedBox>
@@ -516,7 +549,9 @@ const AddNewTeam = ({ setNewTeam }) => {
                 button={true}
                 activeButton={!disabled}
                 style={{ marginTop: "22px", marginBottom: "18px" }}
-                onClick={() => { !disabled && goToAddTools() }}
+                onClick={() => {
+                  !disabled && goToAddTools();
+                }}
               >
                 Next
               </OutlinedBox>
@@ -534,7 +569,7 @@ const AddNewTeam = ({ setNewTeam }) => {
                       name={tool.name}
                       placeholder={`${tool.name} Link`}
                       type="text"
-                      value={TeamTools[index].link}
+                      value={projectTools[index].link}
                       onChange={(event) =>
                         handleToolschange(index, event, tool.icon)
                       }
@@ -548,7 +583,9 @@ const AddNewTeam = ({ setNewTeam }) => {
                   button={true}
                   activeButton={false}
                   style={{ marginTop: "18px", width: "100%" }}
-                  onClick={() => { !backDisabled && goToAddTeam() }}
+                  onClick={() => {
+                    !backDisabled && goToAddProject();
+                  }}
                 >
                   Back
                 </OutlinedBox>
@@ -612,7 +649,7 @@ const AddNewTeam = ({ setNewTeam }) => {
                         </Role>
 
                       </Flex>
-                      <InviteButton onClick={() => handleSelect(user)}>
+                      <InviteButton onClick={() => {access!=="" && role!=="" && handleSelect(user)}}>
                         Add
                       </InviteButton>
                     </MemberCard>
@@ -646,7 +683,6 @@ const AddNewTeam = ({ setNewTeam }) => {
                         </Role>
 
                       </Flex>
-
                       <InviteButton onClick={() => handleRemove(user)}>
                         Remove
                       </InviteButton>
@@ -660,7 +696,9 @@ const AddNewTeam = ({ setNewTeam }) => {
                   button={true}
                   activeButton={false}
                   style={{ marginTop: "18px", width: "100%" }}
-                  onClick={() => { !backDisabled && goToAddTools() }}
+                  onClick={() => {
+                    !backDisabled && goToAddTools();
+                  }}
                 >
                   Back
                 </OutlinedBox>
@@ -668,12 +706,14 @@ const AddNewTeam = ({ setNewTeam }) => {
                   button={true}
                   activeButton={!disabled}
                   style={{ marginTop: "18px", width: "100%" }}
-                  onClick={() => { !disabled && CreateTeam() }}
+                  onClick={() => {
+                    !disabled && CreateProject();
+                  }}
                 >
                   {Loading ? (
                     <CircularProgress color="inherit" size={20} />
                   ) : (
-                    "Create Team"
+                    "Create Project"
                   )}
                 </OutlinedBox>
               </ButtonContainer>
@@ -685,4 +725,4 @@ const AddNewTeam = ({ setNewTeam }) => {
   );
 };
 
-export default AddNewTeam;
+export default AddNewProject;

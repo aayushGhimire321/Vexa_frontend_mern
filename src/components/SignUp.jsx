@@ -10,6 +10,7 @@ import {
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useTheme } from "styled-components";
+import Google from "../Images/google.svg";
 import { IconButton, Modal } from "@mui/material";
 import { loginFailure, loginStart, loginSuccess } from "../redux/userSlice";
 import { openSnackbar } from "../redux/snackbarSlice";
@@ -50,7 +51,6 @@ const Title = styled.div`
   color: ${({ theme }) => theme.text};
   margin: 16px 28px;
 `;
-
 const OutlinedBox = styled.div`
   height: 44px;
   border-radius: 12px;
@@ -60,19 +60,19 @@ const OutlinedBox = styled.div`
     googleButton &&
     `
     user-select: none; 
-    gap: 16px;`}
+  gap: 16px;`}
   ${({ button, theme }) =>
     button &&
     `
     user-select: none; 
-    border: none;
+  border: none;
     background: ${theme.itemHover};
     color: '${theme.soft2}';`}
-  ${({ activeButton, theme }) =>
+    ${({ activeButton, theme }) =>
     activeButton &&
     `
     user-select: none; 
-    border: none;
+  border: none;
     background: ${theme.primary};
     color: white;`}
   margin: 3px 20px;
@@ -83,11 +83,9 @@ const OutlinedBox = styled.div`
   font-weight: 500;
   padding: 0px 14px;
 `;
-
 const GoogleIcon = styled.img`
   width: 22px;
 `;
-
 const Divider = styled.div`
   display: flex;
   display: flex;
@@ -97,7 +95,6 @@ const Divider = styled.div`
   font-size: 14px;
   font-weight: 600;
 `;
-
 const Line = styled.div`
   width: 80px;
   height: 1px;
@@ -125,7 +122,6 @@ const LoginText = styled.div`
   justify-content: center;
   align-items: center;
 `;
-
 const Span = styled.span`
   color: ${({ theme }) => theme.primary};
 `;
@@ -137,10 +133,12 @@ const Error = styled.div`
   display: block;
   ${({ error, theme }) =>
     error === "" &&
-    `display: none;`}
+    `    display: none;
+    `}
 `;
 
 const SignUp = ({ setSignUpOpen, setSignInOpen }) => {
+
   const [nameValidated, setNameValidated] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -166,10 +164,6 @@ const SignUp = ({ setSignUpOpen, setSignInOpen }) => {
       dispatch(loginStart());
       setDisabled(true);
       setLoading(true);
-
-      // Log the values to verify
-      console.log({ name, email, password }); // Added this line
-
       try {
         signUp({ name, email, password }).then((res) => {
           if (res.status === 200) {
@@ -250,7 +244,7 @@ const SignUp = ({ setSignUpOpen, setSignInOpen }) => {
   //validate password
   const validatePassword = () => {
     if (password.length < 8) {
-      setcredentialError("Password must be at least 8 characters long!");
+      setcredentialError("Password must be atleast 8 characters long!");
       setPasswordCorrect(false);
     } else if (password.length > 16) {
       setcredentialError("Password must be less than 16 characters long!");
@@ -263,7 +257,7 @@ const SignUp = ({ setSignUpOpen, setSignInOpen }) => {
     ) {
       setPasswordCorrect(false);
       setcredentialError(
-        "Password must contain at least one lowercase, uppercase, number, and special character!"
+        "Password must contain atleast one lowercase, uppercase, number and special character!"
       );
     } else {
       setcredentialError("");
@@ -276,13 +270,14 @@ const SignUp = ({ setSignUpOpen, setSignInOpen }) => {
     if (name.length < 4) {
       setNameValidated(false);
       setNameCorrect(false);
-      setcredentialError("Name must be at least 4 characters long!");
+      setcredentialError("Name must be atleast 4 characters long!");
     } else {
       setNameCorrect(true);
       if (!nameValidated) {
         setcredentialError("");
         setNameValidated(true);
       }
+
     }
   };
 
@@ -290,25 +285,25 @@ const SignUp = ({ setSignUpOpen, setSignInOpen }) => {
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       setLoading(true);
-      const user = await axios
-        .get("https://www.googleapis.com/oauth2/v3/userinfo", {
-          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
-        })
-        .catch((err) => {
-          dispatch(loginFailure());
-          dispatch(
-            openSnackbar({
-              message: err.message,
-              severity: "error",
-            })
-          );
-        });
+      const user = await axios.get(
+        'https://www.googleapis.com/oauth2/v3/userinfo',
+        { headers: { Authorization: `Bearer ${tokenResponse.access_token}` } },
+      ).catch((err) => {
+        dispatch(loginFailure());
+        dispatch(
+          openSnackbar({
+            message: err.message,
+            severity: "error",
+          })
+        );
+      });
 
       googleSignIn({
         name: user.data.name,
         email: user.data.email,
         img: user.data.picture,
       }).then((res) => {
+        console.log(res);
         if (res.status === 200) {
           dispatch(loginSuccess(res.data));
           setSignUpOpen(false);
@@ -318,6 +313,7 @@ const SignUp = ({ setSignUpOpen, setSignInOpen }) => {
               severity: "success",
             })
           );
+
           setLoading(false);
         } else {
           dispatch(loginFailure(res.data));
@@ -331,7 +327,7 @@ const SignUp = ({ setSignUpOpen, setSignInOpen }) => {
         }
       });
     },
-    onError: (errorResponse) => {
+    onError: errorResponse => {
       dispatch(loginFailure());
       dispatch(
         openSnackbar({
@@ -343,72 +339,129 @@ const SignUp = ({ setSignUpOpen, setSignInOpen }) => {
     },
   });
 
-  const resendOTP = () => {
-    setOtpSent(false);
-    setOtpVerified(false);
-  };
 
+  const theme = useTheme();
+  //ssetSignInOpen(false)
   return (
-    <Container>
-      <Wrapper>
-        <Title>Sign Up</Title>
-        <TextInput
-          placeholder="Full Name"
-          onChange={(e) => setName(e.target.value)}
-          type="text"
-        />
-        <Error error={credentialError}>{credentialError}</Error>
-        <TextInput
-          placeholder="Email Id"
-          onChange={(e) => setEmail(e.target.value)}
-          type="email"
-        />
-        <Error error={emailError}>{emailError}</Error>
-        <TextInput
-          placeholder="Password"
-          onChange={(e) => setPassword(e.target.value)}
-          type="password"
-        />
-        <Error error={credentialError}>{credentialError}</Error>
-        {!otpSent ? (
-          <>
-            <OutlinedBox
-              onClick={handleSignUp}
-              activeButton={!disabled ? true : false}
-            >
-              {Loading ? (
-                <CircularProgress
-                  style={{ color: "white" }}
-                  size={20}
-                  thickness={4}
-                />
-              ) : (
-                "Sign Up"
-              )}
-            </OutlinedBox>
-            <LoginText>
-              Already have an account? <Span onClick={() => setSignInOpen(true)}>Sign In</Span>
-            </LoginText>
-            <Divider>
-              <Line />
-              OR
-              <Line />
-            </Divider>
-            <OutlinedBox googleButton onClick={() => googleLogin()} >
-              <GoogleIcon src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Google_2015_logo.svg/920px-Google_2015_logo.svg.png" />
-              Continue with Google
-            </OutlinedBox>
-          </>
-        ) : (
-          <OTP
-            setOtpVerified={setOtpVerified}
-            otpVerified={otpVerified}
-            email={email}
-            resendOTP={resendOTP}
+    <Modal open={true} onClose={() => setSignInOpen(false)}>
+      <Container>
+        <Wrapper>
+          <CloseRounded
+            style={{
+              position: "absolute",
+              top: "24px",
+              right: "30px",
+              cursor: "pointer",
+            }}
+            onClick={() => setSignUpOpen(false)}
           />
-        )}
-      </Wrapper>
-    </Container>
+          {!otpSent ?
+            <>
+              <Title>Sign Up</Title>
+              <OutlinedBox
+                googleButton={TroubleshootRounded}
+                style={{ margin: "24px" }}
+                onClick={() => googleLogin()}
+              >
+                {Loading ? (
+                  <CircularProgress color="inherit" size={20} />
+                ) : (
+                  <>
+                    <GoogleIcon src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/1000px-Google_%22G%22_Logo.svg.png?20210618182606" />
+                    Sign In with Google</>
+                )}
+              </OutlinedBox>
+              <Divider>
+                <Line />
+                or
+                <Line />
+              </Divider>
+              <OutlinedBox style={{ marginTop: "24px" }}>
+                <Person
+                  sx={{ fontSize: "20px" }}
+                  style={{ paddingRight: "12px" }}
+                />
+                <TextInput
+                  placeholder="Full Name"
+                  type="text"
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </OutlinedBox>
+              <OutlinedBox>
+                <EmailRounded
+                  sx={{ fontSize: "20px" }}
+                  style={{ paddingRight: "12px" }}
+                />
+                <TextInput
+                  placeholder="Email Id"
+                  type="email"
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </OutlinedBox>
+              <Error error={emailError}>{emailError}</Error>
+              <OutlinedBox>
+                <PasswordRounded
+                  sx={{ fontSize: "20px" }}
+                  style={{ paddingRight: "12px" }}
+                />
+                <TextInput
+                  type={values.showPassword ? "text" : "password"}
+                  placeholder="password"
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <IconButton
+                  color="inherit"
+                  onClick={() =>
+                    setValues({ ...values, showPassword: !values.showPassword })
+                  }
+                >
+                  {values.showPassword ? (
+                    <Visibility sx={{ fontSize: "20px" }} />
+                  ) : (
+                    <VisibilityOff sx={{ fontSize: "20px" }} />
+                  )}
+                </IconButton>
+              </OutlinedBox>
+              <Error error={credentialError}>{credentialError}</Error>
+              <OutlinedBox
+                button={true}
+                activeButton={!disabled}
+                style={{ marginTop: "6px" }}
+                onClick={handleSignUp}
+              >
+                {Loading ? (
+                  <CircularProgress color="inherit" size={20} />
+                ) : (
+                  "Create Account"
+                )}
+              </OutlinedBox>
+
+
+
+            </>
+
+            :
+            <OTP email={email} name={name} otpVerified={otpVerified} setOtpVerified={setOtpVerified} />
+          }
+          <LoginText>
+            Already have an account ?
+            <Span
+              onClick={() => {
+                setSignUpOpen(false);
+                setSignInOpen(true);
+              }}
+              style={{
+                fontWeight: "500",
+                marginLeft: "6px",
+                cursor: "pointer",
+              }}
+            >
+              Sign In
+            </Span>
+          </LoginText>
+        </Wrapper>
+      </Container>
+    </Modal>
   );
 };
 

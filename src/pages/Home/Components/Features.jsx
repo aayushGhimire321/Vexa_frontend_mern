@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import HeroBgAnimation from './HeroBgAnimation'; // No need for `../`
+import HeroBgAnimation from '../components/HeroBgAnimation'
 import Groups3Icon from '@mui/icons-material/Groups3';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
