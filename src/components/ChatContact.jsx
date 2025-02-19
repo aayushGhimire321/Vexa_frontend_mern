@@ -7,7 +7,7 @@ const ContactWrapper = styled.div`
   display: flex;
   flex-direction: column;
   padding: 20px;
-  background-color: ${({ theme }) => theme.card};
+  background-color: ${({ theme }) => theme.contact_background};
   border-radius: 10px;
   height: 100%;
   max-width: 400px;
@@ -17,6 +17,7 @@ const ContactWrapper = styled.div`
 const Header = styled.h2`
   font-size: 20px;
   text-align: center;
+  color: ${({ theme }) => theme.text};
   margin-bottom: 15px;
 `;
 
@@ -29,7 +30,7 @@ const ContactList = styled.div`
   max-height: 300px;
   padding: 10px;
   border-radius: 5px;
-  background-color: ${({ theme }) => theme.soft};
+  background-color: ${({ theme }) => theme.bgLighter};
 `;
 
 const ContactItem = styled.div`
@@ -37,13 +38,13 @@ const ContactItem = styled.div`
   align-items: center;
   gap: 12px;
   padding: 10px;
-  background: ${({ theme }) => theme.background};
+  background: ${({ theme }) => theme.card};
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.3s ease;
 
   &:hover {
-    background: ${({ theme }) => theme.soft};
+    background: ${({ theme }) => theme.itemHover};
   }
 `;
 
@@ -55,11 +56,12 @@ const ContactInfo = styled.div`
 const ContactName = styled.span`
   font-size: 16px;
   font-weight: bold;
+  color: ${({ theme }) => theme.text};
 `;
 
 const ContactStatus = styled.span`
   font-size: 12px;
-  color: gray;
+  color: ${({ theme }) => theme.textSoft};
 `;
 
 const ContactButton = styled.button`
@@ -78,7 +80,7 @@ const ContactButton = styled.button`
   transition: background 0.3s ease;
 
   &:hover {
-    background-color: ${({ theme }) => theme.secondary};
+    background-color: ${({ theme }) => theme.soft};
   }
 `;
 
@@ -95,7 +97,7 @@ const ChatContact = ({ showChat, setShowChat }) => {
       <ContactList>
         {contacts.map((contact) => (
           <ContactItem key={contact.id}>
-            <FaUserCircle size={30} />
+            <FaUserCircle size={30} color="#854CE6" />
             <ContactInfo>
               <ContactName>{contact.name}</ContactName>
               <ContactStatus>{contact.status}</ContactStatus>
